@@ -1,5 +1,5 @@
 
-************************************GENERAL USER DETAILS************************************************
+   ************************************GENERAL USER DETAILS************************************************
 
 Spectral Graph Theoretic Analysis Package for Molecular Dynamics Simulations
 
@@ -25,15 +25,15 @@ Data Processing-
 There exist two "example" runfiles for the simplified use of the program at the moment
 1.Example_trajectory.py - is a "fill in the blank" style python file where you point to your specific trajectories of interest and the program runs on its own via a subclass for streamlining operations
 2.FingerPrintExample.py - is a "fill in the blank" style python file where you point to your (previously created) adjacency arrays and create "whole" and if desired "difference" (difference of the two arrays) fingerprints.
-************************************GENERAL USER DETAILS************************************************
+   ************************************GENERAL USER DETAILS************************************************
 
-************************************Important Notes************************************************
+   ************************************Important Notes************************************************
 1. Its important to note the program requires trajectories with topological information and it must be loaded as such
 However it does account for trajectory formats that include inherent topological information such as pdb files
 
 
 
-************************************Important Notes************************************************
+   ************************************Important Notes************************************************
 
 ************************************DEV DETAILS************************************************
 
