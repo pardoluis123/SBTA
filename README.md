@@ -1,4 +1,6 @@
-# SGMD
+
+************************************GENERAL USER DETAILS************************************************
+
 Spectral Graph Theoretic Analysis Package for Molecular Dynamics Simulations
 
 
@@ -23,3 +25,32 @@ Data Processing-
 There exist two "example" runfiles for the simplified use of the program at the moment
 1.Example_trajectory.py - is a "fill in the blank" style python file where you point to your specific trajectories of interest and the program runs on its own via a subclass for streamlining operations
 2.FingerPrintExample.py - is a "fill in the blank" style python file where you point to your (previously created) adjacency arrays and create "whole" and if desired "difference" (difference of the two arrays) fingerprints.
+************************************GENERAL USER DETAILS************************************************
+
+************************************Important Notes************************************************
+1. Its important to note the program requires trajectories with topological information and it must be loaded as such
+However it does account for trajectory formats that include inherent topological information such as pdb files
+
+
+
+************************************Important Notes************************************************
+
+************************************DEV DETAILS************************************************
+
+SGMD Relies on several python packages and they are listed here
+
+1. OS
+2. NUMPY
+3. SCIPY
+4. MDTRAJ
+5. Matplot
+6. sys
+7. os
+
+SGMD also contains a convenient file for holding conveninent items such as list of residues, reisude-name pairings, or even paths to certain trajectories
+(all in the style of python lists that are eventually converted to numpy arrays)
+
+This file is called
+-Convenience.py
+************************************DEV DETAILS************************************************
+
