@@ -1,57 +1,40 @@
+Spectral Graph Theoretic Analysis Package for Molecular Dynamics Simulations (SGMD)
+SGMD (H_PRINT) is a network-theoretic program designed to integrate into various molecular dynamics simulation workflows. It is currently structured using the MDTraj trajectory analysis package.
 
-************************************GENERAL USER DETAILS************************************************
+Workflow Overview
+The workflow is modular and divided into two major sections:
 
-Spectral Graph Theoretic Analysis Package for Molecular Dynamics Simulations
+1. Data Generation
+Input and process molecular dynamics trajectory data into H_PRINT (Trajectory.py).
+Generate adjacency matrices using (Trajectory_Processor.py).
+2. Data Processing
+Create "whole" fingerprints of all pairwise comparisons of residues in the system or filter specific residues of interest using (fingerprint_maker.py).
+Convenient file management operations, such as:
+Creating symbolic links to files without full read/write permissions.
+Stripping and saving new trajectories.
+Data management file operations include:
+Filtering specific residues from adjacency matrices.
+Stripping zero values for sparse matrices.
+Performing matrix-wise operations.
+Example Runfiles
+There are two example runfiles for simplified usage of the program:
 
+Template_trajectory.py: A "fill in the blank" Python file where you point to specific trajectories, and the program runs on its own using a streamlined operations subclass.
+Template_FingerPrint.py: Another "fill in the blank" Python file that allows you to point to previously created adjacency arrays and create "whole" fingerprints or "difference" fingerprints (difference between two arrays).
+Important Notes
+The program requires trajectories with topological information, which must be loaded accordingly.
+It supports trajectory formats with inherent topological information, such as PDB files.
+Development Details
+SGMD relies on several Python packages:
 
-SGMD (H_PRINT) is a network theoretic program built to integrate into various molecular dynamics simulations workflows and is currently structured using trajectory
-analysis package MDTraj.
+os
+numpy
+scipy
+MDTraj
+matplotlib
+sys
 
-
-At this point in development the workflow is modular and is broken into two major sections as follows:
-
-Data Generation-
-
-1. Input and Process molecular dynamics trajectory data into H_PRINT (Trajectory.py)
-2. Generate Adjacency Matrices using (Trajectory_Processor.py)
-
-Data Processing-
-
-1. One could create either "whole" fingerprints of all pairwise comparisons of residues in the system or filter out specific residues of interest to be compared (fingerprint_maker.py)
-2. There are other convenient "file management" section that could preform useful operations such as creating symbolic links to files without full (rw) permissions or stripping and saving new trajectories
-3. There is also a data management file that proves to be useful in the way of manipulating adjacency matrices such as filtering out specific residues, stripping zero values for sparse matrices,
-   and preforming operations on matrix-wise operations.
-
-There exist two "example" runfiles for the simplified use of the program at the moment
-1.Example_trajectory.py - is a "fill in the blank" style python file where you point to your specific trajectories of interest and the program runs on its own via a subclass for streamlining operations
-2.FingerPrintExample.py - is a "fill in the blank" style python file where you point to your (previously created) adjacency arrays and create "whole" and if desired "difference" (difference of the two arrays) fingerprints.
-************************************GENERAL USER DETAILS************************************************
-
-************************************Important Notes************************************************
-1. Its important to note the program requires trajectories with topological information and it must be loaded as such
-However it does account for trajectory formats that include inherent topological information such as pdb files
-
-
-
-************************************Important Notes************************************************
-
-************************************DEV DETAILS************************************************
-
-SGMD Relies on several python packages and they are listed here
-
-1. OS
-2. NUMPY
-3. SCIPY
-4. MDTRAJ
-5. Matplot
-6. sys
-7. os
-
-SGMD also contains a convenient file for holding conveninent items such as list of residues, reisude-name pairings, or even paths to certain trajectories
-(all in the style of python lists that are eventually converted to numpy arrays)
-
-This file is called
--Convenience.py
-
-************************************DEV DETAILS************************************************
-
+Additionally, SGMD includes a convenience file (Convenience.py) that stores useful items such as:
+Lists of residues.
+Residue-name pairings.
+Paths to specific trajectories (stored as Python lists and converted to numpy arrays).
