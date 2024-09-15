@@ -1,15 +1,17 @@
-Spectral Graph Theoretic Analysis Package for Molecular Dynamics Simulations (SGMD)
-SGMD (H_PRINT) is a network-theoretic program designed to integrate into various molecular dynamics simulation workflows. It is currently structured using the MDTraj trajectory analysis package.
+Systems Biology Trajectory Analysis Package (SBTA)
+SBTA is a Systems Biology approach to analyzing Molecular Dynamics Trajectories. The program employs a network-theoretic framework currently structured using mainly the MDTraj trajectory analysis package.
 
 Workflow Overview
 The workflow is modular and divided into two major sections:
 
 1. Data Generation
-Input and process molecular dynamics trajectory data into H_PRINT (Trajectory.py).
-Generate adjacency matrices using (Data_manip.py).
+-Input and process molecular dynamics trajectory data into H_PRINT (Trajectory.py).
+-Generate and output adjacency matrices. (Trajectory_Processor).
 
 2. Data Processing and Visualization
-Create fingerprints of pairwise comparisons of residues in a trajectory using heatmapped adjacency matrices (fingerprint_maker.py).
+-Create fingerprints of pairwise comparisons of residues in a trajectory using heatmapped adjacency matrices (fingerprint_maker.py).
+-Cluster frames of individual Trajectories(Data_manip.py).
+-Filter Adjacency matrices for residues of interest(Data_manip.py).
 
 Convenient file management operations(File_Management.py), such as:
     -Creating symbolic links to files without full read/write permissions.
@@ -19,7 +21,9 @@ Data management file operations(Data_manip.py) include:
     -Filtering specific residues from adjacency matrices.
     -Stripping zero values for sparse matrices.
     -Performing matrix-wise operations.
-
+    -Kmeans Clustering.
+    -Importing CPPTRAJ Data (Hbond as of now).
+    
 
 There are two example runfiles for simplified usage of the program:
 
@@ -34,7 +38,7 @@ It supports trajectory formats with inherent topological information, such as PD
 
 Development Details
 
-SGMD relies on several Python packages:
+SBTA relies on several Python packages:
 os
 numpy
 scipy
