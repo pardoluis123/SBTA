@@ -4,182 +4,15 @@ import scipy.cluster.vq as vq
 import scipy.cluster as cl
 from scipy.stats import zscore as zs
 import mdtraj as md
+from Data_Manip import Data_Manipulator
 from Convenience import n2_residue_numbers, test_topology,restrained_residue_list,test_residues
 import os
 
-class Data_Manipulator:
-    
-    def __init__(self,array_one=None,array_two=None,res_filtered=None,residues_to_filter=None,topology=None,threshold=None)->None:
-        """
-        A Class for manipulating arrays as one sees fit akin to "data management" functions in 
-        data software.
+class Kmeans_Cluster():
 
-        Parameters
-        ----------
-        array_one : arraylike
-            first array of interest (two slots are provided incase one wants to preform operations on the two arrays)
-        
-        array_Two : arraylike
-            first array of interest (two slots are provided incase one wants to preform operations on the two arrays)
-    
-        res_filtered : str
-            List of residues filtered from trajectory previously (soon to be edited out but for now important to function)
-        
-        residues_to_filter : str
-            List of residues IN *CURRENT ARRAY* that one wishes to delete
-        
-        threshold : float
-            An optional value for setting threshholds of significant "average" interactions
-            between residues in array. 
-
-        """
-
-        self.array_one=self.process_input(array_one) if array_one is not None else None
-        self.array_two=self.process_input(array_two) if array_two is not None else array_one
-        self.topology=topology if topology is not None else None
-        self.residues_to_filter=residues_to_filter if residues_to_filter is not None else None
-        self.res_filtered=res_filtered if res_filtered is not None else None
-        self.threshold = threshold if threshold is not None else None
-    
-        #housekeeping special cases
-        if topology is not None:
-            if res_filtered is not None:
-                self.res_filtered=[residue.resSeq for residue in topology.residues if residue.resSeq+1 not in self.res_filtered]
-
-            if residues_to_filter is n2_residue_numbers: #checking if its a dictionry with is
-                self.namedict=n2_residue_numbers
-                self.residues_to_filter = list(n2_residue_numbers.keys())
-                self.residues_to_filter = [residue-1 for residue in self.residues_to_filter]
-            if residues_to_filter is not None:
-                self.residues_to_filter=[residue.resSeq for residue in topology.residues if residue.resSeq+1 in residues_to_filter]
-        else:
-            self.residues=None
-
-        if residues_to_filter is not None:
-            #If we provided residues to filter the data_manip function goes ahead and stores theese when it intializes
-            self.filtered_one=self.filter_array(array=self.array_one) if residues_to_filter is not None else None
-            self.filtered_two=self.filter_array(array=self.array_two) if residues_to_filter is not None else None
-            self.filtered_diff=self.create_difference_array(array_one=self.filtered_one,array_two=self.filtered_two) if residues_to_filter is not None else None
-
-    def create_difference_array(self,array_one=None,array_two=None)->np.ndarray:
-        """
-        Returns a difference array
-
-        Parameters
-        ----------
-        Array One:numpy.ndarray
-            first array of interest
-        Array Two:numpy.ndarray
-            second array of interest         
-        """
-        
-        array_one=array_one if array_one is not None else self.array_one
-        array_two=array_two if array_two is not None else self.array_two
-        
-        difference_array=np.copy(array_two)
-        difference_array[1:,1:]=array_two[1:,1:]-array_one[1:,1:]
-
-        return difference_array
-    
-    @staticmethod
-    def process_input(array)->np.ndarray:
-        """
-        Returns a Numpy array from processed sparse matrix
-
-        Parameters
-        ----------
-        Array:scipy.csr_matrix
-            Array of interest
-        """
-        
-        #array
-        array=array if array is not None else None
-
-        #load either compressed array or regular array (.npy or .npz)
-        try:
-            processed_array=np.array(array.toarray())#239 long
-        except AttributeError:
-            processed_array=np.load(array,allow_pickle=True)
-            
-        return processed_array
-
-    def filter_array(self,array=None,residues_to_filter=None,res_filtered=None)->np.ndarray:
-        """
-        Returns a filtered array 
-
-        Parameters
-        ----------
-        Array:numpy.ndarray
-            Array of interest
-        residues_to_filter:list
-            A list of residues that one wants to filter out of the matrix being inputed
-        res_filtered:list
-            list of residues filtered from the original trajectory in step 1
-        """
-
-        #Residues to filter
-        residues_to_filter=residues_to_filter if residues_to_filter is not None else self.residues_to_filter
-        array=array if array is not None else self.array_one
-        res_filtered= res_filtered if res_filtered is not None else self.res_filtered
-        
-        #Just for correcting numbering
-        if residues_to_filter=="ALL":
-            filtered_array=array
-            return filtered_array
-        
-
-        residues_to_filter = [0]+residues_to_filter 
-        
-        # Create a mask that marks the rows and columns to keep
-        row_mask = np.isin(array[:, 0], residues_to_filter)
-
-        col_mask = np.isin(array[0, :], residues_to_filter)
-        
-        filtered_rows=array[row_mask,:]
-        filtered_array=filtered_rows[:,col_mask]
-
-        residues_to_filter.pop()
-
-        return filtered_array
-
-     #filter an array
-     
-    def filter_all_over_diff(self,array=None,threshhold=None)->np.ndarray:
-        """
-        Returns a filtered array
-
-        Parameters
-        ----------
-        Array:numpy.ndarray
-            Array of interest
-        threshhold:float
-            float value at which the array will be filtered for "significant" values     
-        """
-
-        array = array if array is not None else self.process_input(array=self.array_one)
-
-        if threshhold is not None:
-            threshhold=self.threshold
-            upperboundary=self.threshold
-            lowerboundary=self.threshold*-1
-
-        else:
-            midpoint=np.median(array[1:,1:])
-            max=np.max(array[1:,1:])
-            min=np.min(array[1:,1:])
-            upperboundary=midpoint+(.5*max)
-            lowerboundary=midpoint-(-.5*min)
-
-
-        print(f"midpoint,{midpoint},max{max},min{min},upperboundary{upperboundary},lowerboundary{lowerboundary}")
-
-
-        row_mask = np.any((array[:, 1:] > upperboundary) | (array[:, 1:] < lowerboundary), axis=1)
-        col_mask = np.any((array[1:, :] > upperboundary) | (array[1:, :] < lowerboundary), axis=0)        
-
-
-        filtered_array=array[row_mask][:,col_mask]
-        return filtered_array
+    def __init__(self,array=None):
+        self.process_input=Data_Manipulator.process_input
+        self.array=self.process_input(array) if array is not None else None
 
     def format_traj_for_clust(self,array=None)->np.ndarray:
         """
@@ -192,7 +25,7 @@ class Data_Manipulator:
             Array of interest (should be a 3dimensional array holding 2dimensional arrays i.e. xyz->xy)     
         """
         
-        array=array if array is not None else self.array_one
+        array=array if array is not None else self.array
 
         for idx in range(len(array)): 
             array[idx] = array[idx].flatten() 
@@ -210,7 +43,7 @@ class Data_Manipulator:
             Array of interest (should be a 3dimensional array holding 2dimensional arrays i.e. xyz->xy)     
         """
 
-        array=array if array is not None else self.array_one
+        array=array if array is not None else self.array
 
         n=0
         for i in array:#iterate through replicates
@@ -250,7 +83,7 @@ class Data_Manipulator:
             Array of interest a one dimensional array holding flattened adjacency matrices 
         """
         
-        array=array if array is not None else self.array_one
+        array=array if array is not None else self.array
         #for frame in replicate
         for idx in range(len(array)):
             current_frame = self.format_array_for_whitening(array=array[idx])
@@ -269,7 +102,7 @@ class Data_Manipulator:
         Array:numpy.ndarray
             Array of interest a one dimensional array holding flattened adjacency matrices 
         """
-        array=array if array is not None else self.array_one
+        array=array if array is not None else self.array
         
         #for frame in replicate
         for idx in range(len(array)):
@@ -432,29 +265,15 @@ class Data_Manipulator:
         return 
 
 if __name__=="__main__":
-    #load in a a sparse matrix
-    
     array_CCUGCU="/zfshomes/lperez/fingerprint/H_Print/H_Print_CCUCGU_G34/CCUCGU_G34_Replicate_Array.npy"
     out_GCU="/zfshomes/lperez/fingerprint/H_Print/cluster_output_CCUGCU/"
     
     #array_CCUCGU="/zfshomes/lperez/fingerprint/H_Print/testtxt/test_frame_Replicate_Average.npz"    
     
     #Class Initiated
-    Test=Data_Manipulator(array_one=array_CCUGCU,topology=md.load_topology("/home66/kscopino/AMBER22/CODONS/CCUGCU_G34/TLEAP/5JUP_N2_GCU_nowat.prmtop"))
+    Test=Kmeans_Cluster(array=array_CCUGCU)
     Test.save_cluster_array()
     
     #path to previously saved array
     realpath="/zfshomes/lperez/fingerprint/H_Print/cluster_output_CCUGCU/_reparray_first_pass_cluster.npy"
     
-    os._exit(0)    
-
-    Test=Data_Manipulator(array_one=array_CCUGCU,array_two=array_CCUCGU,residues_to_filter=n2_residue_numbers,topology=md.load_topology("/home66/kscopino/AMBER22/CODONS/CCUGCU_G34/TLEAP/5JUP_N2_GCU_nowat.prmtop"))
-    print(f"filtered one\n{Test.filtered_one[0,:]}\n\n filtered two\n{Test.filtered_two[0,:]} \n\nfiltered diff\n{Test.filtered_diff[0,:]}")
-    np.savetxt("mdtraj_difference.txt",Test.filtered_diff)
-
-    
-    
-
-
-       
-        
