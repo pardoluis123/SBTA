@@ -5,7 +5,7 @@ Workflow Overview
 The workflow is modular and divided into two major sections:
 
 1. Data Generation
--Input and process molecular dynamics trajectory data into H_PRINT (Trajectory.py).
+-Input and process molecular dynamics trajectory data into SBTA (Trajectory.py).
 -Generate and output adjacency matrices. (Trajectory_Processor).
 
 2. Data Processing and Visualization
